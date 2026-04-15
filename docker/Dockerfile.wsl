@@ -1,0 +1,19 @@
+# Dockerfile.wsl — acpx dev client (runs on Windows/WSL, AMD64)
+# Provides the headless ACP CLI for submitting tasks to the Mac Mini gateway
+FROM node:22-alpine
+
+RUN npm install -g openclaw@2026.4.14 acpx@latest
+
+WORKDIR /workspace
+
+# Point acpx at the Mac Mini gateway
+ENV OPENCLAW_GATEWAY_URL=ws://192.168.68.67:18789
+ENV OPENCLAW_GATEWAY_TOKEN=""
+
+# Mount your project directory here: -v $(pwd):/workspace
+VOLUME ["/workspace"]
+
+# Default: drop into acpx interactive shell
+# Override with: docker run ... acpx pi 'do something'
+ENTRYPOINT ["acpx"]
+CMD ["--help"]

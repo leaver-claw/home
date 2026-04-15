@@ -1,0 +1,17 @@
+# Dockerfile.dgx — Ollama inference server (runs on DGX Spark, ARM64 / GB10)
+# Serves the OpenAI-compatible /v1 API consumed by OpenClaw on the Mac Mini
+FROM ollama/ollama:latest
+
+# Bind to all interfaces so the Mac Mini can reach port 11434
+ENV OLLAMA_HOST=0.0.0.0:11434
+
+# Pre-pull models on first container start via entrypoint wrapper
+COPY dgx-entrypoint.sh /dgx-entrypoint.sh
+RUN chmod +x /dgx-entrypoint.sh
+
+EXPOSE 11434
+
+HEALTHCHECK --interval=15s --timeout=5s --retries=5 \
+  CMD curl -sf http://localhost:11434/api/tags || exit 1
+
+ENTRYPOINT ["/dgx-entrypoint.sh"]

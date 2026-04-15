@@ -1,0 +1,135 @@
+{
+  "auth": {
+    "profiles": {
+      "anthropic:default": {
+        "provider": "anthropic",
+        "mode": "api_key"
+      },
+      "github-copilot:github": {
+        "provider": "github-copilot",
+        "mode": "token"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-6"
+      },
+      "workspace": "/openclaw/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "memorySearch": {
+        "provider": "github-copilot",
+        "model": "text-embedding-3-small"
+      }
+    },
+    "list": [
+      {
+        "id": "stormy",
+        "workspace": "/openclaw/agents/stormy/workspace",
+        "identity": { "name": "Stormy", "emoji": "⛈️" }
+      },
+      {
+        "id": "c2",
+        "workspace": "/openclaw/agents/c2/workspace",
+        "identity": { "name": "C2", "emoji": "🎯" }
+      },
+      {
+        "id": "reacher",
+        "workspace": "/openclaw/agents/reacher/workspace",
+        "identity": { "name": "Reacher", "emoji": "🔍" }
+      },
+      {
+        "id": "dev",
+        "workspace": "/openclaw/agents/dev/workspace",
+        "identity": { "name": "Dev", "emoji": "💻" }
+      },
+      {
+        "id": "lex",
+        "workspace": "/openclaw/agents/lex/workspace",
+        "identity": { "name": "Lex", "emoji": "📄" }
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "agentId": "stormy",
+      "match": { "channel": "discord", "peer": { "kind": "channel", "id": "1486404746741809193" } }
+    },
+    {
+      "agentId": "c2",
+      "match": { "channel": "discord", "peer": { "kind": "channel", "id": "1486404768560844901" } }
+    },
+    {
+      "agentId": "reacher",
+      "match": { "channel": "discord", "peer": { "kind": "channel", "id": "1486404768292274277" } }
+    },
+    {
+      "agentId": "dev",
+      "match": { "channel": "discord", "peer": { "kind": "channel", "id": "1486404768397004820" } }
+    },
+    {
+      "agentId": "lex",
+      "match": { "channel": "discord", "peer": { "kind": "channel", "id": "1486404768422170644" } }
+    }
+  ],
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "token": { "source": "env", "provider": "default", "id": "DISCORD_BOT_TOKEN" },
+      "groupPolicy": "open",
+      "streaming": { "mode": "off" },
+      "guilds": {
+        "1484566649607688395": {
+          "requireMention": false
+        }
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "brave": {
+        "enabled": true,
+        "config": {
+          "webSearch": {
+            "apiKey": { "source": "env", "provider": "default", "id": "BRAVE_API_KEY" },
+            "mode": "web"
+          }
+        }
+      },
+      "anthropic": {
+        "enabled": true
+      }
+    }
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave",
+        "maxResults": 5
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": { "source": "env", "provider": "default", "id": "OPENCLAW_GATEWAY_TOKEN" }
+    }
+  }
+}

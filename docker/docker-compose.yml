@@ -1,0 +1,74 @@
+# Three-machine OpenClaw stack
+#
+#   dgx    — Ollama inference server          (192.168.68.68, DGX Spark)
+#   mac    — OpenClaw gateway + Discord       (192.168.68.67, Mac Mini)
+#   wsl    — acpx dev client                  (Windows/WSL PC)
+#
+# Run the appropriate profile on each machine:
+#   DGX:  docker compose --profile dgx  up -d
+#   Mac:  docker compose --profile mac  up -d
+#   WSL:  docker compose --profile wsl  run --rm wsl acpx pi 'hello'
+
+services:
+
+  # ── DGX Spark ─────────────────────────────────────────────────────────────
+  dgx:
+    profiles: [dgx]
+    build:
+      context: .
+      dockerfile: Dockerfile.dgx
+    image: openclaw-dgx:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+    # GPU passthrough — adjust for your driver (nvidia / nvidia-container-toolkit)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── Mac Mini ──────────────────────────────────────────────────────────────
+  mac:
+    profiles: [mac]
+    build:
+      context: .
+      dockerfile: Dockerfile.mac
+    image: openclaw-mac:latest
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+    volumes:
+      - openclaw_workspace:/openclaw/workspace
+      - openclaw_agents:/openclaw/agents
+    env_file: .env
+    environment:
+      # Point agent LLM calls at the DGX
+      OPENCLAW_LLM_BASE_URL: "http://192.168.68.68:11434/v1"
+      OPENCLAW_URL: "http://192.168.68.68:11434"
+
+  # ── Windows / WSL ─────────────────────────────────────────────────────────
+  wsl:
+    profiles: [wsl]
+    build:
+      context: .
+      dockerfile: Dockerfile.wsl
+    image: openclaw-wsl:latest
+    # Not restarted — run on demand
+    volumes:
+      - .:/workspace
+    env_file: .env
+    environment:
+      # Reach the Mac Mini gateway from WSL
+      OPENCLAW_GATEWAY_URL: "ws://192.168.68.67:18789"
+
+volumes:
+  ollama_models:
+  openclaw_workspace:
+  openclaw_agents:

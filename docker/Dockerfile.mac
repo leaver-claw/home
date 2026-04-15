@@ -1,0 +1,22 @@
+# Dockerfile.mac — OpenClaw gateway (runs on Mac Mini, ARM64)
+# Hosts the control plane: gateway, Discord channel, Brave Search, GitHub Copilot auth
+FROM node:22-alpine
+
+RUN npm install -g openclaw@2026.4.14
+
+WORKDIR /openclaw
+
+# Config is mounted at runtime; this just sets the default path
+ENV OPENCLAW_CONFIG=/openclaw/openclaw.json
+
+# Brave Search key injected at runtime via --env or .env file
+ENV BRAVE_API_KEY=""
+
+COPY openclaw.json /openclaw/openclaw.json
+
+EXPOSE 18789
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
+  CMD wget -qO- http://localhost:18789/healthz || exit 1
+
+CMD ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
