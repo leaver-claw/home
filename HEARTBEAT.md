@@ -25,6 +25,16 @@
 
 ---
 
+## Daily Tasks (8:00 PM CT)
+
+### 1. Research Daily Update
+- Dispatch Reacher agent to each research area
+- Update existing research files with new findings
+- Generate summary in `RESEARCH_LOG.md`
+- Commit and push to git repo
+
+---
+
 ## Weekly Tasks (run every Monday at 9:00 AM CT)
 
 ### 1. Weekly Summary
